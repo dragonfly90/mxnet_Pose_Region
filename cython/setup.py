@@ -64,6 +64,12 @@ ext_modules = [
         extra_compile_args = {'gcc': ["-Wno-cpp", "-Wno-unused-function"]},
         include_dirs = [numpy_include]
     ),
+    Extension(
+        "bbox",
+        ["bbox.pyx"],
+        extra_compile_args = {'gcc': ["-Wno-cpp", "-Wno-unused-function"]},
+        include_dirs = [numpy_include]
+    ),
 ]
 
 # run the customize_compiler

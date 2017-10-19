@@ -88,7 +88,7 @@ class poseModule(mx.mod.Module):
                 cmodel.backward()   
                 self.update()           
                 
-                if i > 10:
+                if i > 100:
                     break
                 try:
                     next_data_batch = next(data_iter)
@@ -131,12 +131,18 @@ cmodel = poseModule(symbol=sym, context=mx.gpu(0),
                                  'partaffinityglabel',
                                  'heatweight',
                                  'vecweight'])
-
+## Load parameters from vgg
+warmupModel = '/data/guest_users/liangdong/liangdong/practice_demo/mxnet_CPM/model/vgg19'
+testsym, arg_params, aux_params = mx.model.load_checkpoint(warmupModel, 0)
+newargs = {}
+for ikey in config.TRAIN.vggparams:
+    newargs[ikey] = arg_params[ikey]
+'''  
 testsym, newargs, aux_params = mx.model.load_checkpoint(config.TRAIN.initial_model, 0)
-
+'''
 prefix = 'vggpose'
 starttime = time.time()
-cmodel.fit(cocodata, num_epoch = config.TRAIN.num_epoch, batch_size = batch_size, prefix = prefix, carg_params = newargs)
+cmodel.fit(cocodata, num_epoch = 6, batch_size = batch_size, prefix = prefix, carg_params = newargs)
 cmodel.save_checkpoint(prefix, config.TRAIN.num_epoch)
 endtime = time.time()
 

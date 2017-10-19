@@ -28,7 +28,7 @@ from pycocotools.cocoeval import COCOeval
 
 from config.config import config
 
-from GenerateLabelCPM import *
+from generateLabelCPM import *
 from modelCPM import *
 
 os.environ["MXNET_CUDNN_AUTOTUNE_DEFAULT"] = "0"

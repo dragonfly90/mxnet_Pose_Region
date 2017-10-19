@@ -22,7 +22,7 @@ config.TEST.imgIds_num = 5
 
 config.TRAIN = edict()
 
-config.TRAIN.num_epoch = 1
+config.TRAIN.num_epoch = 3
 
 config.TRAIN.initial_model = '../realtimePose'
 
@@ -44,7 +44,7 @@ config.TRAIN.scale_max = 1.1
 
 config.TRAIN.target_dist = 0.6
 
-config.TRAIN.max_rotate_degree = 0
+config.TRAIN.max_rotate_degree = 30
 
 config.TRAIN.scale_set = False
 
