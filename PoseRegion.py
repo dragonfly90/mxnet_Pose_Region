@@ -677,7 +677,7 @@ class PoseNet(gluon.Block):
     def forward(self, x):
         return self.pafmap(x), self.heatmap(x), self.locprediction(x)
     
-batch_size = 10
+batch_size = 1
 train_data = cocoIterweightBatch('pose_io/data.json',
                     'data', (batch_size, 3, 368,368),
                     ['heatmaplabel','partaffinityglabel','heatweight','vecweight',
@@ -711,7 +711,7 @@ l2_loss = L2SumLoss()
 ctx = mx.cpu()  # it may takes too long to train using CPU
 
 net = PoseNet()
-net.initialize(mx.init.Xavier(magnitude=2), ctx=ctx)
+net.initialize(mx.init.Xavier(magnitude=0.01), ctx=ctx)
 
 from mxnet.gluon.model_zoo import vision
 vgg = vision.vgg19()
@@ -728,7 +728,7 @@ for param in param_list:
     net.params.setattr('posenet0_hybridsequential0_'+k[1]+'_'+k[2], 
                        vggparameters.get(param))
 
-trainer = gluon.Trainer(net.collect_params(), 'sgd', {'learning_rate': 0.1, 'wd': 5e-4})
+trainer = gluon.Trainer(net.collect_params(), 'sgd', {'learning_rate': 0.00004})
 
 start_epoch = 0
 epochs = 3
