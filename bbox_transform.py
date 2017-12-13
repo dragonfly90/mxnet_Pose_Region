@@ -52,6 +52,7 @@ def nonlinear_transform(ex_rois, gt_rois):
     :param gt_rois: [N, 4]
     :return: [N, 4]
     """
+    
     assert ex_rois.shape[0] == gt_rois.shape[0], 'inconsistent rois number'
 
     ex_widths = ex_rois[:, 2] - ex_rois[:, 0] + 1.0

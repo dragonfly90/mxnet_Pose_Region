@@ -624,6 +624,70 @@ def targetAndMask(newmeta):
         
     return boxtarget, boxmask
 
+'''
+big bounding box
+'''
+def targetAndMask_big(newmeta):
+    boxtarget = np.zeros((4,46,46))
+    boxmask = np.zeros((46,46))
+    allboxs = list()
+    alltargets = list()
+    allaxis = list()
+    
+    ## main person 
+    joints = newmeta['joint_self']['joints']
+    visiblelabel = newmeta['joint_self']['isVisible']
+    groundtruth = [newmeta['bbox'][0], newmeta['bbox'][1], 
+                   newmeta['bbox'][0]+newmeta['bbox'][2], newmeta['bbox'][1]+newmeta['bbox'][3]]
+    
+    for joint, visible in zip(joints, visiblelabel):
+        cx = int(round(joint['x']/8))
+        cy = int(round(joint['y']/8))
+        for i in range(-2, 3):
+            for j in range(-2, 3):
+                featurex = cx + i
+                featurey = cy + j
+                if visible <= 1 and featurex >= 0 and featurex < 46 and featurey >= 0 and featurey < 46:
+                    anchors = boxes[int(featurey), int(featurex), :, :]
+                    box = all_anchors[featurey*46+featurex]
+                    allboxs.append(box)
+                    alltargets.append(groundtruth)
+                    allaxis.append((featurex, featurey))
+            
+    ## other persons
+    for key, value in newmeta['joint_others'].iteritems():
+        joints = value['joints']
+        visiblelabel = value['isVisible']
+        cbox = newmeta['bbox_other'][key]
+        groundtruth = [cbox[0], cbox[1], cbox[0]+cbox[2], cbox[1]+cbox[3]]
+        
+        for joint, visible in zip(joints, visiblelabel):
+            #featurex = int(round(joint['x']/8))
+            #featurey = int(round(joint['y']/8))
+            cx = int(round(joint['x']/8))
+            cy = int(round(joint['y']/8))
+            for i in range(-1, 2):
+                for j in range(-1, 2):
+                    featurex = cx + i
+                    featurey = cy + j
+                    if visible <= 1 and featurex >= 0 and featurex < 46 and featurey >= 0 and featurey < 46:
+                        anchors = boxes[int(featurey), int(featurex), :, :]
+                        box = all_anchors[featurey*46+featurex]
+                        allboxs.append(box)
+                        alltargets.append(groundtruth)
+                        allaxis.append((featurex, featurey))
+                        # print featurey, featurex
+    nlen = len(allaxis)
+    if nlen > 1:
+	target = bbox_transform(np.array(allboxs), np.array(alltargets))
+    
+    #	nlen = len(allaxis)
+    	for i in range(nlen):
+        	boxmask[allaxis[i][1], allaxis[i][0]] = 1
+        	boxtarget[:, allaxis[i][1], allaxis[i][0]] = target[i, :] 
+        
+    return boxtarget, boxmask
+
 def getImageandLabel(iterjson):
     meta = readmeta(iterjson)
     TransformMetaJoints(meta)
